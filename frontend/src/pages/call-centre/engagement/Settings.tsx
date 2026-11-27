@@ -139,7 +139,7 @@ export default function Settings({ csrf }: { csrf: string }) {
               <input type="number" min={0} max={10} value={draft.daily_cap} onChange={event => update({ daily_cap: Number(event.target.value) })} />
             </label>
             <label>Copy manager emails to (optional)
-              <input type="email" value={draft.escalation_cc} placeholder="contact@example.com" onChange={event => update({ escalation_cc: event.target.value })} />
+              <input type="email" value={draft.escalation_cc} placeholder="contact+838ef184945e@example.com" onChange={event => update({ escalation_cc: event.target.value })} />
             </label>
           </div>
           <fieldset>

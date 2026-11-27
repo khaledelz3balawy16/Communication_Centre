@@ -191,7 +191,7 @@ export default function AddEmployeeModal({ open, onClose, employees, editTarget,
               type="email"
               value={form.email}
               onChange={e => set('email', e.target.value)}
-              placeholder="contact@example.com"
+              placeholder="contact+4054d0a58abf@example.com"
               className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none transition-colors"
             />
           </div>

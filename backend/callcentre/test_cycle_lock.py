@@ -57,7 +57,7 @@ class CycleLockTests(SimpleTestCase):
         return token, objects.filter.call_args_list[0].args[0], release
 
     def test_a_lock_left_by_a_killed_worker_is_taken_over(self):
-        stale = SimpleNamespace(token='CHANGE_ME' + cycle.HOST + ':0123456789abcdef', locked_until=timezone.now() + timedelta(hours=1))
+        stale = SimpleNamespace(token='200:' + cycle.HOST + ':0123456789abcdef', locked_until=timezone.now() + timedelta(hours=1))
         with patch.object(cycle, 'abandoned', return_value=True):
             token, condition, release = self.run_lock(stale)
         self.assertIn(('token', stale.token), condition.children)
@@ -65,7 +65,7 @@ class CycleLockTests(SimpleTestCase):
         release.assert_called_once_with(token)
 
     def test_a_live_holder_is_waited_for(self):
-        live = SimpleNamespace(token='CHANGE_ME' + cycle.HOST + ':0123456789abcdef', locked_until=timezone.now() + timedelta(hours=1))
+        live = SimpleNamespace(token='200:' + cycle.HOST + ':0123456789abcdef', locked_until=timezone.now() + timedelta(hours=1))
         with patch.object(cycle, 'abandoned', return_value=False):
             token, condition, release = self.run_lock(live, held=0)
         self.assertNotIn(('token', live.token), condition.children)

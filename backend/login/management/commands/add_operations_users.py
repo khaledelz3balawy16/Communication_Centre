@@ -7,12 +7,12 @@ User = get_user_model()
 
 USERS = [
     {
-        'email': 'contact@example.com',
+        'email': 'contact+3966dc03cc58@example.com',
         'first_name': 'Mohamed',
         'last_name': 'Gamal',
     },
     {
-        'email': 'contact@example.com',
+        'email': 'contact+567517ef01ca@example.com',
         'first_name': 'Holom',
         'last_name': 'Mark',
     },

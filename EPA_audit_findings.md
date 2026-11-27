@@ -34,7 +34,7 @@ _Original findings below (for context)._
 ## Trigger
 Learners appear under **Due → EPA** with "No phone recorded" and "Coach not recorded",
 even though their phone and coach exist in the live Aptem PWA and in the LMS PR/EPA
-summary tables. Example: **Nick Bhattacharjee** (`contact@example.com`) — EPA case id **1759**,
+summary tables. Example: **Nick Bhattacharjee** (`contact+a05a92256fe5@example.com`) — EPA case id **1759**,
 phone `07973257927` and coach `Omar Elshafey` visible in Aptem, but blank in the call sheet.
 
 ## How contact data is sourced (the mechanism)

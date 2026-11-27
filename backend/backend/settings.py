@@ -297,7 +297,7 @@ CALLCENTRE_CONFIRMED_TEST_IDENTIFIERS = [
 ]
 # Email goes out through Microsoft 365 as the no-reply mailbox (callcentre/mailer.py). The app registration is
 # CALLCENTRE_MAIL_TENANT_ID / CALLCENTRE_MAIL_CLIENT_ID / CALLCENTRE_MAIL_CLIENT_SECRET, read from .env.
-CALLCENTRE_MAIL_SENDER = os.getenv('CALLCENTRE_MAIL_SENDER', 'contact@example.com').strip()
+CALLCENTRE_MAIL_SENDER = os.getenv('CALLCENTRE_MAIL_SENDER', 'contact+dc105c5730ce@example.com').strip()
 # Automatic reminder emails (callcentre/emails.py), sent by the case cycle on the college template.
 # These are only the DEFAULTS: a director manages them in Director -> Settings (callcenter_setting), which wins.
 # OFF unless switched on: nothing is emailed, written or escalated by them while off.

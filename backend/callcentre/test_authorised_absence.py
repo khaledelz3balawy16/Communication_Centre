@@ -34,10 +34,10 @@ class PlanTests(SimpleTestCase):
         self.assertIsNone(aa.saved_plan({'Training_plan': 'not json', 'Learning_plan': None}))
 
     def test_a_learner_with_two_enrolment_rows_is_offered_nothing(self):
-        found = [{'id': 1, 'email': 'contact@example.com'}, {'id': 2, 'email': 'contact@example.com'}, {'id': 3, 'email': 'contact@example.com'}]
+        found = [{'id': 1, 'email': 'contact+3ab40df5d962@example.com'}, {'id': 2, 'email': 'contact+0f699dbb337a@example.com'}, {'id': 3, 'email': 'contact+6af6ba7d2db3@example.com'}]
         with patch('callcentre.authorised_absence.rows', return_value=found):
-            result = aa.enrolments({'contact@example.com': 'contact@example.com', 'contact@example.com': 'contact@example.com', 'contact@example.com': 'contact@example.com'})
-        self.assertEqual(set(result), {'contact@example.com'})
+            result = aa.enrolments({'contact+3ab40df5d962@example.com': 'contact+3ab40df5d962@example.com', 'contact+0f699dbb337a@example.com': 'contact+3ab40df5d962@example.com', 'contact+6af6ba7d2db3@example.com': 'contact+6af6ba7d2db3@example.com'})
+        self.assertEqual(set(result), {'contact+6af6ba7d2db3@example.com'})
 
     def test_the_group_is_taken_only_when_every_profile_agrees(self):
         found = [{'enrolment_id': 1, 'group_id': 'G1'}, {'enrolment_id': 1, 'group_id': 'G1'},
@@ -49,11 +49,11 @@ class PlanTests(SimpleTestCase):
 
 class UpcomingTests(SimpleTestCase):
     def run_upcoming(self, sessions, plan=None, profiles=None, preset=None, registers=None):
-        enrolment = [{'id': 7, 'email': 'contact@example.com', 'Training_plan': json.dumps(plan) if plan is not None else None,
+        enrolment = [{'id': 7, 'email': 'contact+3ab40df5d962@example.com', 'Training_plan': json.dumps(plan) if plan is not None else None,
                       'Learning_plan': None}]
         answers = [enrolment, profiles or [], *([preset, []] if preset else []), sessions, *([registers] if registers is not None else [])]
         with patch('callcentre.authorised_absence.rows', side_effect=answers) as read:
-            result = aa.upcoming({'contact@example.com': {}}, {'contact@example.com': 'contact@example.com'}, NOW)
+            result = aa.upcoming({'contact+3ab40df5d962@example.com': {}}, {'contact+3ab40df5d962@example.com': 'contact+3ab40df5d962@example.com'}, NOW)
         return result, read
 
     def test_only_active_sessions_of_the_learners_modules_in_the_next_two_weeks(self):
@@ -63,7 +63,7 @@ class UpcomingTests(SimpleTestCase):
             session_row(occurrence=None, repeat='none', series='s9', start=None) | {'start_datetime': (NOW + timedelta(days=3)).replace(tzinfo=None)},
             session_row(module='other', occurrence='o3'),            # not on the plan
         ], plan=[{'moduleId': 'm1', 'assignmentMode': 'explicit'}])
-        sessions = result['contact@example.com']
+        sessions = result['contact+3ab40df5d962@example.com']
         self.assertEqual([s['ref'] for s in sessions], ['occurrence:o1', 'series:s9'])
         self.assertEqual(sessions[0]['date'], date(2026, 11, 7))
         modules, start, end = read.call_args.args[2]
@@ -78,7 +78,7 @@ class UpcomingTests(SimpleTestCase):
             | {'start_datetime': (NOW - timedelta(hours=1)).replace(tzinfo=None)},  # a one-off has no register to wait for
             session_row(occurrence='next', start=NOW + timedelta(days=1)),
         ], plan=[{'moduleId': 'm1', 'assignmentMode': 'explicit'}], registers=[{'occurrence_id': 'done'}])
-        self.assertEqual([s['ref'] for s in result['contact@example.com']], ['occurrence:live', 'occurrence:next'])
+        self.assertEqual([s['ref'] for s in result['contact+3ab40df5d962@example.com']], ['occurrence:live', 'occurrence:next'])
         self.assertEqual(read.call_args.args[2], [['done', 'live']])   # only started lectures are looked up
 
     def test_a_learner_without_a_plan_or_an_exact_group_gets_nothing(self):
@@ -128,21 +128,21 @@ class MarkAbsentTests(SimpleTestCase):
         session = {'ref': 'occurrence:o1', 'occurrence_id': 'o1', 'module_id': 'm1', 'module': 'Marketing',
                    'session_number': 3, 'starts_at': NOW + timedelta(days=2), 'ends_at': None, 'date': date(2026, 11, 7)}
         with patch('callcentre.coach_centre.cached_directory', return_value=self.directory()), \
-                patch('callcentre.coach_centre.authorised_absence.upcoming', return_value={'contact@example.com': [session]}) as upcoming, \
+                patch('callcentre.coach_centre.authorised_absence.upcoming', return_value={'contact+67e04138d519@example.com': [session]}) as upcoming, \
                 patch('callcentre.coach_centre.authorised_absence.add', return_value=SimpleNamespace(pk=4, note='')) as add, \
                 patch('callcentre.coach_centre.log') as log:
             with self.assertRaisesMessage(ValueError, 'lectures in the list'):
-                coach_centre.mark_absent.__wrapped__('contact@example.com', 'Sara', 'contact@example.com', 'occurrence:other', 'work', '')
+                coach_centre.mark_absent.__wrapped__('contact+d1a139cf7f05@example.com', 'Sara', 'contact+67e04138d519@example.com', 'occurrence:other', 'work', '')
             with self.assertRaisesMessage(ValueError, 'one of your learners'):
-                coach_centre.mark_absent.__wrapped__('contact@example.com', 'Sara', 'contact@example.com', 'occurrence:o1', 'work', '')
-            coach_centre.mark_absent.__wrapped__('contact@example.com', 'Sara', 'contact@example.com', 'occurrence:o1', 'work', '')
+                coach_centre.mark_absent.__wrapped__('contact+d1a139cf7f05@example.com', 'Sara', 'contact+54d041d7fa5b@example.com', 'occurrence:o1', 'work', '')
+            coach_centre.mark_absent.__wrapped__('contact+d1a139cf7f05@example.com', 'Sara', 'contact+67e04138d519@example.com', 'occurrence:o1', 'work', '')
         learners, emails = upcoming.call_args.args
-        self.assertEqual(set(learners), {'contact@example.com'})
-        self.assertEqual(set(emails), {'contact@example.com', 'contact@example.com'})
+        self.assertEqual(set(learners), {'contact+67e04138d519@example.com'})
+        self.assertEqual(set(emails), {'contact+67e04138d519@example.com', 'contact+383e3812ed04@example.com'})
         add.assert_called_once()
         self.assertEqual(add.call_args.args[2], session)
-        self.assertEqual(log.call_args.args[:4], ('contact@example.com', 'Sara', 'coach', 'absence_added'))
+        self.assertEqual(log.call_args.args[:4], ('contact+d1a139cf7f05@example.com', 'Sara', 'coach', 'absence_added'))
 
     def test_a_reason_is_needed_and_the_note_is_optional(self):
         with self.assertRaisesMessage(ValueError, 'Choose a reason'):
-            aa.add({}, 'contact@example.com', {}, '', '', 'Sara', 'coach')
+            aa.add({}, 'contact+f8aaf3a644ca@example.com', {}, '', '', 'Sara', 'coach')

@@ -161,7 +161,7 @@ export default function FeedbackPage() {
                       name="email"
                       value={form.email}
                       onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      placeholder="contact@example.com"
+                      placeholder="contact+fdc543487e95@example.com"
                       className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-kbc-navy"
                     />
                   </div>

@@ -46,7 +46,7 @@ def main():
         CALLCENTRE_REMINDER_TYPES={'attendance', 'pr', 'mcm', 'pr_missed', 'mcm_missed',
                                   'signature', 'satisfaction'},
         CALLCENTRE_EMAIL_DAILY_CAP=2, CALLCENTRE_ESCALATION_EMAIL='', CALLCENTRE_PUBLIC_URL='',
-        CALLCENTRE_MAIL_SENDER='contact@example.com',
+        CALLCENTRE_MAIL_SENDER='contact+dc105c5730ce@example.com',
         CALLCENTRE_CONFIRMED_TEST_IDENTIFIERS=[], CALLCENTRE_HOLIDAYS=[],
         CALLCENTRE_AI_ENABLED=False,
     )

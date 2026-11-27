@@ -79,7 +79,7 @@ export async function adminRequest<T>(path: string, options: { method?: string; 
     response = await fetchWithTimeout(`/api/administration/${path}`, {
       method: options.method || 'GET',
       signal: options.signal,
-      credentials: 'CHANGE_ME',
+      credentials: 'same-origin',
       cache: 'no-store',
       headers: { Accept: 'application/json', ...(options.body !== undefined ? { 'Content-Type': 'application/json' } : {}) },
       ...(options.body !== undefined ? { body: JSON.stringify(options.body) } : {}),

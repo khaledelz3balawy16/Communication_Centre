@@ -23,7 +23,7 @@ if _lms_file.exists():
     TRAINING_PLAN_LMS_REFERENCE_SOURCE = json.loads(_lms_file.read_text(encoding='utf-8'))
     if (TRAINING_PLAN_LMS_REFERENCE_SOURCE['host'], TRAINING_PLAN_LMS_REFERENCE_SOURCE['port'], TRAINING_PLAN_LMS_REFERENCE_SOURCE['dbname']) != ('127.0.0.1', 55432, 'tp_lms_reference_source'):
         raise RuntimeError('LMS reference source must be the verified local copy.')
-SECRET_KEY = 'CHANGE_ME' + _state['password']
+SECRET_KEY = 'isolated-training-plan-lms-' + _state['password']
 DEBUG = True
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'testserver']
 INSTALLED_APPS = [

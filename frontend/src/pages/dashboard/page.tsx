@@ -440,7 +440,7 @@ export default function DashboardPage() {
 
   const loadCards = async () => {
     try {
-      const response = await fetch('/api/dashboard-cards/', { credentials: 'CHANGE_ME', cache: 'no-store' });
+      const response = await fetch('/api/dashboard-cards/', { credentials: 'include', cache: 'no-store' });
       if (!response.ok) return;
       const payload = await response.json();
       if (Array.isArray(payload)) { setCards(payload.map(serverCardToLink)); setCardsFromServer(true); }
@@ -484,7 +484,7 @@ export default function DashboardPage() {
     try {
       const response = await fetch(id ? `/api/dashboard-cards/${id}/` : '/api/dashboard-cards/', {
         method: id ? 'PUT' : 'POST',
-        credentials: 'CHANGE_ME',
+        credentials: 'include',
         headers: JSON_HEADERS,
         body: JSON.stringify(body),
       });
@@ -544,7 +544,7 @@ export default function DashboardPage() {
     try {
       const response = await fetch('/api/dashboard-cards/reorder/', {
         method: 'POST',
-        credentials: 'CHANGE_ME',
+        credentials: 'include',
         headers: JSON_HEADERS,
         body: JSON.stringify({ ids }),
       });

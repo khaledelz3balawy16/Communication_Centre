@@ -232,7 +232,7 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="contact@example.com"
+                  placeholder="contact+3df5d8522772@example.com"
                   className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition-colors focus:border-kbc-navy"
                 />
               </div>

@@ -1,11 +1,4 @@
-"""The Zoom accounts the call centre reads calls from, added by a director on the Zoom Phone page.
-
-Each account is a Zoom Server-to-Server OAuth app: its Account ID, Client ID and Client Secret. The secret is stored
-encrypted (Fernet) with the key in the server's ``CHANGE_ME`` setting, which never leaves the server, and is never
-sent back to the page (only its last four characters). An account keeps a short key (``source_account`` on its calls);
-adding an account whose Zoom Account ID was synced before takes that key back, with its call history. The list lives in
-``callcenter_setting`` (key ``zoom_accounts``); a missing table means no accounts.
-"""
+"The Zoom accounts the call centre reads calls from, added by a director on the Zoom Phone page.\n\nEach account is a Zoom Server-to-Server OAuth app: its Account ID, Client ID and Client Secret. The secret is stored\nencrypted (Fernet) with the key in the server's ``CHANGE_ME`` setting, which never leaves the server, and is never\nsent back to the page (only its last four characters). An account keeps a short key (``source_account`` on its calls);\nadding an account whose Zoom Account ID was synced before takes that key back, with its call history. The list lives in\n``callcenter_setting`` (key ``zoom_accounts``); a missing table means no accounts.\n"
 import os
 import re
 from datetime import timedelta
@@ -163,7 +156,7 @@ def _webhook(data):
     if not token:
         return None
     if len(token) > 128 or not re.fullmatch(r'[A-Za-z0-9_-]+', token):
-        raise FieldError('webhook_secret', 'This does not look like a Zoom Secret Token: copy it again from the app’s Features page.')
+        raise FieldError('webhook_secret', 'CHANGE_ME')
     return {'webhook_secret': _encrypt(token), 'webhook_end': token[-4:]}
 
 
@@ -211,7 +204,7 @@ def update(key, data, actor):
     client_id = _text(data, 'client_id', 'Client ID', 64, r'[A-Za-z0-9_-]+')
     new_secret = str(data.get('client_secret') or '').strip()
     if new_secret and (len(new_secret) > 128 or not re.fullmatch(r'\S+', new_secret)):
-        raise FieldError('client_secret', 'This does not look like a Zoom Client Secret: copy it again from the app’s App Credentials page.')
+        raise FieldError('client_secret', 'CHANGE_ME')
     encrypted = _encrypt(new_secret) if new_secret else None
     webhook = _webhook(data)
     drop_webhook = str(data.get('remove_webhook') or '').lower() == 'true'

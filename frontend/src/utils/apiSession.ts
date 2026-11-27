@@ -8,7 +8,7 @@ export function csrfToken() {
 }
 
 /**
- * The backend API runs on the signed-in Django session. For every CHANGE_ME /api/ request this sends the CSRF
+ * The backend API runs on the signed-in Django session. For every same-origin /api/ request this sends the CSRF
  * token on changes, and a 401 (the session ended) clears the stored sign-in so the app returns to the login page.
  */
 export function installApiSession() {

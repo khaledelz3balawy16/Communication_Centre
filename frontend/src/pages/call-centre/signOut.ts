@@ -8,7 +8,7 @@ export function signOut(navigate: ReturnType<typeof useNavigate>) {
     trackingSessionId: String(user?.trackingSessionId || ''), userId: String(user?.id || ''),
     email: String(user?.email || ''), username: String(user?.username || ''), reason: 'logout_button',
   });
-  void fetch('/api/auth/logout/', { method: 'POST', keepalive: true, credentials: 'CHANGE_ME', headers: { 'Content-Type': 'application/json' }, body }).catch(() => undefined);
+  void fetch('/api/auth/logout/', { method: 'POST', keepalive: true, credentials: 'include', headers: { 'Content-Type': 'application/json' }, body }).catch(() => undefined);
   clearAuthStorage();
   navigate('/login', { replace: true });
 }

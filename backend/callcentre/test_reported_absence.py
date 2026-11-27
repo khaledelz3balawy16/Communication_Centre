@@ -7,11 +7,11 @@ from . import reported_absence as ra
 from .lms_booking import kbc_report_id
 
 DAY = date(2026, 11, 3)
-EMAILS = {'contact@example.com', 'contact@example.com'}
+EMAILS = {'contact+67e04138d519@example.com', 'contact+6e267a4a1196@example.com'}
 CASE = SimpleNamespace(overdue_since=DAY)
 
 
-def report(attendance_id, email='contact@example.com', day=DAY, learner_id=62, status='pending', catchup=None, pk=9):
+def report(attendance_id, email='contact+6e267a4a1196@example.com', day=DAY, learner_id=62, status='pending', catchup=None, pk=9):
     return {'id': pk, 'attendance_id': attendance_id, 'learner_id': learner_id, 'learner_email': email,
             'session_date': day, 'status': status, 'reason_category': 'illness', 'catchup_event_key': catchup}
 
@@ -34,7 +34,7 @@ class LiveReportTests(SimpleTestCase):
 
     def test_a_blank_report_email_still_matches_on_the_source_learner(self):
         self.assertIsNotNone(ra.live_report(CASE, EMAILS, live(), [report(kbc_report_id('62:teams:501'), email='')]))
-        self.assertIsNone(ra.live_report(CASE, EMAILS, live(), [report(kbc_report_id('62:teams:501'), email='contact@example.com'),
+        self.assertIsNone(ra.live_report(CASE, EMAILS, live(), [report(kbc_report_id('62:teams:501'), email='contact+381bec3046d4@example.com'),
                                                                  report(1, status='declined', email='')]))
 
     def test_without_a_hashed_match_the_ledger_counts_unless_a_report_that_day_is_declined(self):
@@ -59,7 +59,7 @@ class LegacyReportTests(SimpleTestCase):
 
     def test_another_learner_day_or_a_declined_or_catch_up_report_does_not_count(self):
         keys = {'k-am'}
-        self.assertIsNone(ra.legacy_report(CASE, EMAILS, keys, [report(kbc_report_id('k-am'), email='contact@example.com')]))
+        self.assertIsNone(ra.legacy_report(CASE, EMAILS, keys, [report(kbc_report_id('k-am'), email='contact+381bec3046d4@example.com')]))
         self.assertIsNone(ra.legacy_report(CASE, EMAILS, keys, [report(kbc_report_id('k-am'), day=date(2026, 11, 4))]))
         self.assertIsNone(ra.legacy_report(CASE, EMAILS, keys, [report(kbc_report_id('k-am'), status='declined')]))
         self.assertIsNone(ra.legacy_report(CASE, EMAILS, keys, [report(kbc_report_id('k-am'), catchup='ev-1')]))

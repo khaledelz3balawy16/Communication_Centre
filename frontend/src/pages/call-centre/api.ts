@@ -195,7 +195,7 @@ export class ApiError extends Error {
 export async function request<T>(url: string, options: RequestOptions = {}): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(url, { credentials: 'CHANGE_ME', cache: 'no-store', ...options });
+    response = await fetch(url, { credentials: 'include', cache: 'no-store', ...options });
   } catch (reason) {
     if (reason instanceof DOMException && reason.name === 'AbortError') throw reason;
     throw new ApiError('Could not reach the server. Check the backend is running and your internet connection, then try again.', 0);

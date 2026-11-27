@@ -453,8 +453,8 @@ class LmsBookingTests(SimpleTestCase):
         learner.assert_not_called()
 
 
-COACHES = {'olivia evans': 'contact@example.com', 'afaan khan': 'contact@example.com',
-           'med maher': 'contact@example.com'}
+COACHES = {'olivia evans': 'contact+3bc97a343f1a@example.com', 'afaan khan': 'contact+37c9538dcddd@example.com',
+           'med maher': 'contact+b23cce919b15@example.com'}
 
 
 @mock.patch('callcentre.sources.coach_email', lambda name: COACHES.get(' '.join(str(name).split()).casefold(), ''))
@@ -516,7 +516,7 @@ class BookingEmailTests(SimpleTestCase):
         self.assertTrue(all(url.startswith('https://') for links in booking_links.CATALOGUE.values() for url in links.values()))
 
 
-AFAAN = 'contact@example.com'
+AFAAN = 'contact+37c9538dcddd@example.com'
 
 
 class CoachBookingPageTests(SimpleTestCase):
@@ -538,10 +538,10 @@ class CoachBookingPageTests(SimpleTestCase):
         self.assertEqual(booking_links.page_for(AFAAN), ('afaan', 'catalogue'))
 
     def test_a_confirmed_page_gives_a_new_coach_links(self):
-        self.assertEqual(booking_links.links_for_email('contact@example.com'), {})
-        self.confirmed = {'contact@example.com': 'rukshana'}
+        self.assertEqual(booking_links.links_for_email('contact+920dd7582813@example.com'), {})
+        self.confirmed = {'contact+920dd7582813@example.com': 'rukshana'}
         booking_links.refresh(force=True)
-        self.assertEqual(booking_links.links_for_email(' contact@example.com '),
+        self.assertEqual(booking_links.links_for_email(' contact+920dd7582813@example.com '),
                          {'support': 'https://book.example/ruk-support'})
 
     def test_confirmed_no_page_and_a_removed_page_give_no_links(self):
@@ -781,7 +781,7 @@ class HelpdeskTests(SimpleTestCase):
 
 class CoachPagesViewTests(SimpleTestCase):
     manager = CallRequestTests.manager
-    coaches = {'Afaan Khan': AFAAN, 'Rukshana Hussain': 'contact@example.com', 'No Email': ''}
+    coaches = {'Afaan Khan': AFAAN, 'Rukshana Hussain': 'contact+920dd7582813@example.com', 'No Email': ''}
 
     def call(self, user, payload=None):
         factory = RequestFactory()
@@ -817,9 +817,9 @@ class CoachPagesViewTests(SimpleTestCase):
         self.assertTrue(data['set_up'])
 
     def test_director_confirms_a_page_for_a_register_coach(self):
-        status, _, confirm = self.call(self.manager, {'email': 'contact@example.com', 'slug': 'rukshana'})
+        status, _, confirm = self.call(self.manager, {'email': 'contact+920dd7582813@example.com', 'slug': 'rukshana'})
         self.assertEqual(status, 200)
-        confirm.assert_called_once_with('contact@example.com', 'rukshana', 'manager')
+        confirm.assert_called_once_with('contact+920dd7582813@example.com', 'rukshana', 'manager')
         self.assertEqual(self.call(self.manager, {'email': AFAAN, 'slug': ''})[0], 200)   # no booking page
 
     def test_unknown_coach_or_page_is_refused(self):
@@ -832,26 +832,26 @@ class CoachPagesViewTests(SimpleTestCase):
 
 
 class CoachRuleTests(SimpleTestCase):
-    staff = {'case owner': 'contact@example.com', 'aptem owner': 'contact@example.com'}
+    staff = {'case owner': 'contact+ca08a81b7628@example.com', 'aptem owner': 'contact+707732fa5387@example.com'}
 
     def test_coach_name_first_then_case_owner_then_aptem(self):
-        self.assertEqual(learners.pick_coach('Lms Coach', 'contact@example.com', 'Case Owner', 'Aptem Owner', self.staff),
-                         ('Lms Coach', 'contact@example.com'))
-        self.assertEqual(learners.pick_coach('', '', 'Case  Owner', 'Aptem Owner', self.staff), ('Case Owner', 'contact@example.com'))
-        self.assertEqual(learners.pick_coach('Default Owner', 'contact@example.com', '', 'Aptem Owner', self.staff),
-                         ('Aptem Owner', 'contact@example.com'))
+        self.assertEqual(learners.pick_coach('Lms Coach', 'contact+43e4afe83a84@example.com', 'Case Owner', 'Aptem Owner', self.staff),
+                         ('Lms Coach', 'contact+43e4afe83a84@example.com'))
+        self.assertEqual(learners.pick_coach('', '', 'Case  Owner', 'Aptem Owner', self.staff), ('Case Owner', 'contact+ca08a81b7628@example.com'))
+        self.assertEqual(learners.pick_coach('Default Owner', 'contact+ba4e1081eb96@example.com', '', 'Aptem Owner', self.staff),
+                         ('Aptem Owner', 'contact+707732fa5387@example.com'))
         self.assertEqual(learners.pick_coach('', '', 'Default Owner', '', self.staff), ('', ''))
 
     def test_staff_email_only_for_a_unique_name(self):
-        rows = [{'Username': 'Sam Coach', 'Email': 'contact@example.com'}, {'Username': 'sam  coach', 'Email': 'contact@example.com'},
-                {'Username': 'Jo Coach', 'Email': 'contact@example.com'}]
-        self.assertEqual(learners.staff_emails(rows), {'jo coach': 'contact@example.com'})
+        rows = [{'Username': 'Sam Coach', 'Email': 'contact+f8239a31b5de@example.com'}, {'Username': 'sam  coach', 'Email': 'contact+cb1230d0538e@example.com'},
+                {'Username': 'Jo Coach', 'Email': 'contact+e32eb734423e@example.com'}]
+        self.assertEqual(learners.staff_emails(rows), {'jo coach': 'contact+e32eb734423e@example.com'})
 
     def test_directory_coach_skips_placeholders_and_records_coach_emails(self):
         people = learners.merge([lms_row(Coach_name='Default Owner', Case_owner='Case Owner', aptem_id='7')], [aptem_row()],
-                                [{'Username': 'Case Owner', 'Email': 'contact@example.com'}])
+                                [{'Username': 'Case Owner', 'Email': 'contact+ca08a81b7628@example.com'}])
         self.assertEqual(people['learner@example.com']['coach'], 'Case Owner')
-        self.assertEqual(people.coach_emails, {'case owner': 'contact@example.com'})
+        self.assertEqual(people.coach_emails, {'case owner': 'contact+ca08a81b7628@example.com'})
 
     def test_active_holds_active_and_delivery_learners_with_their_aptem_email(self):
         people = learners.merge([lms_row(aptem_id='7', Programme_status='Delivery'), lms_row(Email='gone@example.com',
@@ -897,7 +897,7 @@ class LmsReviewTests(SimpleTestCase):
         self.assertIsNone(self.classify(status='in-progress', reasons=native))
 
     def test_two_progress_review_kinds_are_separate_calls(self):
-        items = [{'email': 'contact@example.com', 'case_type': 'pr', 'review_type': t, 'day': date(2026, 9, d), 'ref': f'reviews:{d}'}
+        items = [{'email': 'contact+478abec74305@example.com', 'case_type': 'pr', 'review_type': t, 'day': date(2026, 9, d), 'ref': f'reviews:{d}'}
                  for t, d in (('Progress Review', 10), ('Progress Review', 12), ('Progress Review (+ Skills Radar)', 15))]
         groups = lms_reviews.group_items(items)
         self.assertEqual(sorted(len(g) for g in groups.values()), [1, 2])
@@ -911,7 +911,7 @@ class LmsReviewTests(SimpleTestCase):
     def test_review_evidence_closes_from_the_lms_state(self):
         from .evidence import review_evidence
         created = datetime(2026, 10, 1, 9, tzinfo=LONDON)
-        ticket = SimpleNamespace(source_type='signature', learner_email='contact@example.com', evidence_after=None, created_at=created,
+        ticket = SimpleNamespace(source_type='signature', learner_email='contact+478abec74305@example.com', evidence_after=None, created_at=created,
                                  source_data={'review_refs': ['reviews:5']})
         signed = SimpleNamespace(errors={}, review_states={'reviews:5': {
             'status': 'Completed', 'completed': datetime(2026, 9, 20, tzinfo=LONDON), 'updated_at': datetime(2026, 10, 2, tzinfo=LONDON)}})
@@ -922,7 +922,7 @@ class LmsReviewTests(SimpleTestCase):
 
     def test_one_completed_review_does_not_close_a_case_with_another_still_overdue(self):
         from .evidence import review_evidence
-        ticket = SimpleNamespace(source_type='mcm', learner_email='contact@example.com', evidence_after=None,
+        ticket = SimpleNamespace(source_type='mcm', learner_email='contact+478abec74305@example.com', evidence_after=None,
                                  created_at=datetime(2026, 10, 1, 9, tzinfo=LONDON), source_data={'review_refs': ['reviews:1', 'reviews:2']})
         done = {'status': 'Completed', 'completed': datetime(2026, 10, 2, tzinfo=LONDON), 'updated_at': datetime(2026, 10, 2, tzinfo=LONDON)}
         states = SimpleNamespace(errors={}, review_states={'reviews:1': done, 'reviews:2': {**done, 'status': 'Not Scheduled', 'completed': None}})
@@ -1000,7 +1000,7 @@ class LmsReviewTests(SimpleTestCase):
 
     def test_legacy_mode_reads_aptem_learners_from_aptem_only(self):
         today = date(2026, 10, 4)
-        native = {'id': 7, 'email': 'contact@example.com', 'review_type': 'Progress Review', 'status': 'not-scheduled',
+        native = {'id': 7, 'email': 'contact+478abec74305@example.com', 'review_type': 'Progress Review', 'status': 'not-scheduled',
                   'day': date(2026, 9, 20), 'completed_at': None, 'profile_id': 1, 'aptem_source': True}
         with mock.patch.object(lms_reviews, 'connections', {lms_reviews.LMS: mock.MagicMock()}), \
                 mock.patch.object(lms_reviews, '_fetch', side_effect=[[], [native], [], [{**native, 'aptem_source': False}]]):
@@ -1008,23 +1008,23 @@ class LmsReviewTests(SimpleTestCase):
             self.assertEqual([item['ref'] for item in lms_reviews.review_items(today)], ['instance:7'])
 
     def test_review_types_group_whatever_their_letter_case(self):
-        items = [{'email': 'contact@example.com', 'case_type': 'pr', 'review_type': t, 'day': date(2026, 9, 10), 'ref': f'reviews:{i}'}
+        items = [{'email': 'contact+478abec74305@example.com', 'case_type': 'pr', 'review_type': t, 'day': date(2026, 9, 10), 'ref': f'reviews:{i}'}
                  for i, t in enumerate(('Progress Review', 'Progress review', ' progress  review '))]
         self.assertEqual(len(lms_reviews.group_items(items)), 1)
 
 
 class StaleCaseTests(SimpleTestCase):
     """Open cases whose source no longer reports the issue are set aside, never resolved."""
-    people = {'contact@example.com': {'learner_email': 'contact@example.com'}, 'contact@example.com': {'learner_email': 'contact@example.com'}}
+    people = {'contact+478abec74305@example.com': {'learner_email': 'contact+478abec74305@example.com'}, 'contact+60e52edf9070@example.com': {'learner_email': 'contact+478abec74305@example.com'}}
 
     def test_signature_generation_carries_roles_and_reuses_the_open_case(self):
         from . import sources
 
         class Directory(dict):
-            active = {'contact@example.com'}
+            active = {'contact+478abec74305@example.com'}
 
-        people = Directory({'contact@example.com': {'learner_email': 'contact@example.com'}})
-        item = {'email': 'contact@example.com', 'case_type': 'signature', 'review_type': 'Progress Review',
+        people = Directory({'contact+478abec74305@example.com': {'learner_email': 'contact+478abec74305@example.com'}})
+        item = {'email': 'contact+478abec74305@example.com', 'case_type': 'signature', 'review_type': 'Progress Review',
                 'day': date(2026, 9, 15), 'ref': 'reviews:100',
                 'missing_signature_roles': ['employer', 'learner'],
                 'signature_contacts': {'employer': {'email': 'boss@example.org'}}}
@@ -1039,7 +1039,7 @@ class StaleCaseTests(SimpleTestCase):
             self.assertTrue(data['employer_signature_missing'])
             self.assertTrue(data['learner_signature_missing'])
             self.assertEqual(data['review_refs'], ['reviews:100'])
-            existing = [{'pk': 10, 'source_type': 'signature', 'learner_email': 'contact@example.com',
+            existing = [{'pk': 10, 'source_type': 'signature', 'learner_email': 'contact+478abec74305@example.com',
                          'overdue_since': item['day'], 'source_data': data, 'archived': False}]
             self.assertEqual(sources.generate_review_cases(people, date(2026, 10, 26), reasons, existing), 0)
             create.assert_called_once()
@@ -1051,7 +1051,7 @@ class StaleCaseTests(SimpleTestCase):
         class Directory(dict):
             active = set()
 
-        item = {'email': 'contact@example.com', 'case_type': 'signature', 'review_type': 'Progress Review',
+        item = {'email': 'contact+478abec74305@example.com', 'case_type': 'signature', 'review_type': 'Progress Review',
                 'day': date(2026, 9, 15), 'ref': 'reviews:100', 'missing_signature_roles': ['employer']}
         with mock.patch.object(sources, 'get_source', return_value=[item]), \
                 mock.patch.object(sources, 'upsert_case') as create, \
@@ -1059,22 +1059,22 @@ class StaleCaseTests(SimpleTestCase):
             self.assertEqual(sources.generate_review_cases(Directory(self.people), date(2026, 10, 26), set()), 0)
             create.assert_not_called()
 
-    def case(self, pk, source_type='mcm', email='contact@example.com', **data):
+    def case(self, pk, source_type='mcm', email='contact+478abec74305@example.com', **data):
         return {'pk': pk, 'source_type': source_type, 'learner_email': email, 'overdue_since': date(2026, 9, 10),
                 'source_data': {'review_type': 'Monthly Coaching Meeting', **data}, 'archived': False}
 
     def test_cases_follow_whether_the_source_still_reports_them(self):
         from . import sources
-        reported = sources.open_key(self.people, 'mcm', 'contact@example.com', None, {'review_type': 'monthly coaching meeting'})
+        reported = sources.open_key(self.people, 'mcm', 'contact+60e52edf9070@example.com', None, {'review_type': 'monthly coaching meeting'})
         cases = [self.case(1), self.case(2, 'pr', review_type='Progress Review'), self.case(3, 'pr', review_type='Progress Review', eligible=False),
-                 self.case(4, 'mcm', 'contact@example.com')]
+                 self.case(4, 'mcm', 'contact+d2e87fa97059@example.com')]
         with mock.patch.object(sources, 'set_eligible') as set_eligible:
             sources.retire(self.people, cases, {reported}, 'gone', keep=lambda case: case['pk'] == 4)
         # 1 is still reported (through the alias), 2 is set aside, 3 was already aside, 4 waits for its proof.
         self.assertEqual([c.args[:2] for c in set_eligible.call_args_list], [(2, False)])
         with mock.patch.object(sources, 'set_eligible') as set_eligible:
             sources.retire(self.people, [self.case(3, 'pr', review_type='Progress Review', eligible=False)],
-                           {sources.open_key(self.people, 'pr', 'contact@example.com', None, {'review_type': 'Progress Review'})}, 'gone')
+                           {sources.open_key(self.people, 'pr', 'contact+478abec74305@example.com', None, {'review_type': 'Progress Review'})}, 'gone')
         self.assertEqual(set_eligible.call_args.args[:2], (3, True))
 
     def test_set_aside_cases_and_past_reminders_leave_every_list(self):
@@ -1092,23 +1092,23 @@ class StaleCaseTests(SimpleTestCase):
         closed = mock.MagicMock()
         closed.filter.return_value.values_list.return_value = [{'review_refs': ['reviews:1']}]
         with mock.patch.object(sources.CaseTicket, 'objects', closed):
-            self.assertTrue(sources.closed_case_covers('mcm', ['contact@example.com'], 'x', ['reviews:1']))
-            self.assertFalse(sources.closed_case_covers('mcm', ['contact@example.com'], 'x', ['reviews:1', 'reviews:2']))
+            self.assertTrue(sources.closed_case_covers('mcm', ['contact+478abec74305@example.com'], 'x', ['reviews:1']))
+            self.assertFalse(sources.closed_case_covers('mcm', ['contact+478abec74305@example.com'], 'x', ['reviews:1', 'reviews:2']))
 
     def test_attendance_absent_on_every_register_is_a_missed_lecture(self):
-        rows = [{'key': 'am', 'Email': 'contact@example.com ', 'date': date(2026, 9, 10), 'Attendance': 'A', 'module': 'Marketing'},
-                {'key': 'pm', 'Email': 'contact@example.com', 'date': date(2026, 9, 10), 'Attendance': 'absent', 'module': 'Marketing '},
-                {'key': 'am', 'Email': 'contact@example.com', 'date': date(2026, 9, 10), 'Attendance': 'P', 'module': 'Marketing'}]
+        rows = [{'key': 'am', 'Email': 'contact+478abec74305@example.com ', 'date': date(2026, 9, 10), 'Attendance': 'A', 'module': 'Marketing'},
+                {'key': 'pm', 'Email': 'contact+478abec74305@example.com', 'date': date(2026, 9, 10), 'Attendance': 'absent', 'module': 'Marketing '},
+                {'key': 'am', 'Email': 'contact+d2e87fa97059@example.com', 'date': date(2026, 9, 10), 'Attendance': 'P', 'module': 'Marketing'}]
         with mock.patch.object(summaries, '_fetch', side_effect=[rows, rows]):
             missed = summaries.attendance_missed_for_week(date(2026, 9, 7), date(2026, 9, 13))
-        self.assertEqual([(m['email'], m['attendance_module']) for m in missed], [('contact@example.com', 'Marketing')])
+        self.assertEqual([(m['email'], m['attendance_module']) for m in missed], [('contact+478abec74305@example.com', 'Marketing')])
 
     def test_epa_follows_the_programme_status_before_the_subscription(self):
-        rows = [{'ID': 1, 'Email': 'contact@example.com', 'Program-Status': 'Completed', 'Subscription Status': 'Active', 'End-Date': '2026-09-01'},
-                {'ID': 2, 'Email': 'contact@example.com', 'Program-Status': '', 'Subscription Status': 'Active', 'End-Date': '2026-09-01'},
-                {'ID': 3, 'Email': 'contact@example.com', 'Program-Status': 'Active', 'Subscription Status': '', 'End-Date': '2026-09-01'}]
+        rows = [{'ID': 1, 'Email': 'contact+478abec74305@example.com', 'Program-Status': 'Completed', 'Subscription Status': 'Active', 'End-Date': '2026-09-01'},
+                {'ID': 2, 'Email': 'contact+d2e87fa97059@example.com', 'Program-Status': '', 'Subscription Status': 'Active', 'End-Date': '2026-09-01'},
+                {'ID': 3, 'Email': 'contact+050e252cb12a@example.com', 'Program-Status': 'Active', 'Subscription Status': '', 'End-Date': '2026-09-01'}]
         with mock.patch.object(summaries, '_fetch', return_value=rows):
-            self.assertEqual([r['email'] for r in summaries.epa_overdue_rows(date(2026, 10, 1))], ['contact@example.com', 'contact@example.com'])
+            self.assertEqual([r['email'] for r in summaries.epa_overdue_rows(date(2026, 10, 1))], ['contact+d2e87fa97059@example.com', 'contact+050e252cb12a@example.com'])
 
     def test_epa_window_is_more_than_seven_through_sixty_seven_days(self):
         today = date(2026, 10, 20)
@@ -1136,8 +1136,8 @@ class StaleCaseTests(SimpleTestCase):
         directory = mock.MagicMock()
         directory.get.side_effect = lambda email, default=None: self.people.get(email, default)
         with mock.patch('callcentre.sources.cached_directory', return_value=directory):
-            self.assertEqual(learner_owner('contact@example.com', {'contact@example.com': 5}), 5)
-            self.assertIsNone(learner_owner('contact@example.com', {'contact@example.com': 5}))
+            self.assertEqual(learner_owner('contact+60e52edf9070@example.com', {'contact+478abec74305@example.com': 5}), 5)
+            self.assertIsNone(learner_owner('contact+f3752061f292@example.com', {'contact+478abec74305@example.com': 5}))
 
 
 
@@ -1266,7 +1266,7 @@ class EmailSettingsTests(SimpleTestCase):
 
     def test_sender_defaults_to_the_no_reply_mailbox(self):
         from . import mailer
-        self.assertEqual(mailer.sender(), 'contact@example.com')
+        self.assertEqual(mailer.sender(), 'contact+dc105c5730ce@example.com')
 
 
     @override_settings(CALLCENTRE_EMAIL_LIVE_ALLOWED=False)

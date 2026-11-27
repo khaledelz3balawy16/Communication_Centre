@@ -11,7 +11,7 @@ function lmsRequestError(response: Response, payload: { code?: string; detail?: 
 
 export async function requestLmsHolidays(): Promise<Holiday[]> {
   const response = await fetchWithTimeout('/api/training-plan/lms-reference/holidays/', {
-    credentials: 'CHANGE_ME', cache: 'no-store', timeoutMs: 30000,
+    credentials: 'same-origin', cache: 'no-store', timeoutMs: 30000,
   });
   const payload = await response.json().catch(() => null);
   if (!response.ok || !Array.isArray(payload?.holidays) || !payload.holidays.every((holiday: Holiday | null) =>
@@ -40,7 +40,7 @@ export interface LmsReferenceRow {
 
 export async function requestLmsSessionCounts(): Promise<Record<string, number | null>> {
   const response = await fetchWithTimeout('/api/training-plan/lms-reference/session-counts/', {
-    credentials: 'CHANGE_ME', cache: 'no-store', timeoutMs: 15000,
+    credentials: 'same-origin', cache: 'no-store', timeoutMs: 15000,
   });
   const payload = await response.json().catch(() => null);
   if (!response.ok || !payload?.sessionCounts || typeof payload.sessionCounts !== 'object' || Array.isArray(payload.sessionCounts)) {
@@ -70,7 +70,7 @@ export class LmsReferenceError extends Error {
 export async function requestLmsReference(capture = false): Promise<LmsReference | null> {
   const response = await fetchWithTimeout('/api/training-plan/lms-reference/', {
     method: capture ? 'POST' : 'GET',
-    credentials: 'CHANGE_ME',
+    credentials: 'same-origin',
     cache: 'no-store',
     timeoutMs: 30000,
     ...(capture ? {
@@ -90,7 +90,7 @@ export async function requestLmsReference(capture = false): Promise<LmsReference
 
 export async function requestLmsTutorNames(): Promise<Record<string, string>> {
   const response = await fetchWithTimeout('/api/training-plan/lms-reference/tutors/', {
-    credentials: 'CHANGE_ME', cache: 'no-store', timeoutMs: 15000,
+    credentials: 'same-origin', cache: 'no-store', timeoutMs: 15000,
   });
   const payload = await response.json().catch(() => null);
   if (!response.ok || !payload?.tutorNames || typeof payload.tutorNames !== 'object' || Array.isArray(payload.tutorNames)) {
@@ -103,7 +103,7 @@ export type LmsCohortLabels = Record<string, { cohortId: string | null; cohortNa
 
 export async function requestLmsCohorts(): Promise<LmsCohortLabels> {
   const response = await fetchWithTimeout('/api/training-plan/lms-reference/cohorts/', {
-    credentials: 'CHANGE_ME', cache: 'no-store', timeoutMs: 15000,
+    credentials: 'same-origin', cache: 'no-store', timeoutMs: 15000,
   });
   const payload = await response.json().catch(() => null);
   if (!response.ok || !payload?.cohorts || typeof payload.cohorts !== 'object' || Array.isArray(payload.cohorts)) {
